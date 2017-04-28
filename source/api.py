@@ -1,15 +1,10 @@
 from flask import Flask
 from domain.cheapestRouteUseCase import getCheapestRoute
 from flask_restful import reqparse, abort, Api, Resource
+from resources.themes import Themes
 
 app = Flask(__name__)
 api = Api(app)
-
-TODOS = {
-    'todo1': {'task': 'build an API'},
-    'todo2': {'task': '?????'},
-    'todo3': {'task': 'profit!'},
-}
 
 
 def abort_if_todo_doesnt_exist(todo_id):
@@ -67,6 +62,7 @@ class TestAction(Resource):
 ## Actually setup the Api resource routing here
 ##
 api.add_resource(TestAction, '/route')
+api.add_resource(Themes, '/themes')
 
 
 if __name__ == "__main__":
