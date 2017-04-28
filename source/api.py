@@ -57,13 +57,25 @@ class TodoList(Resource):
         return TODOS[todo_id], 201
 
 class TestAction(Resource):
+
     def get(self):
-        r = {"requests": [
-            {"to": "PRG", "flyFrom": "BCN", "directFlights": 0, "dateFrom": "11/06/2017", "dateTo": "13/06/2017"},
-            {"to": "BCN", "flyFrom": "PRG", "directFlights": 0, "dateFrom": "12/06/2017", "dateTo": "15/06/2017"}
-        ]}
-        response = requests.post('https://api.skypicker.com/flights_multi?partner=picky&locale=es&curr=EUR', data = json.dumps(r), headers = {'Content-Type':'application/json'} )
-        return response.json()
+
+        cheapests = []
+        availDest = ['AMS','BER','MIL','PAR','MUC','OSL']
+        for dest1 in availDest:
+            for dest2 in availDest:
+                if dest1 is not dest2:
+                    r = {"requests": [
+                        {"to": dest1, "flyFrom": "BCN", "directFlights": 0, "dateFrom": "11/06/2017", "dateTo": "13/06/2017"},
+                        {"to": dest2, "flyFrom": dest1, "directFlights": 0, "dateFrom": "14/06/2017", "dateTo": "16/06/2017"},
+                        {"to": "BCN", "flyFrom": dest2, "directFlights": 0, "dateFrom": "17/06/2017", "dateTo": "19/06/2017"}
+                    ]}
+                    response = requests.post('https://api.skypicker.com/flights_multi?partner=picky&locale=es&curr=EUR', data = json.dumps(r), headers = {'Content-Type':'application/json'} )
+                    if len(response.json()) > 0:
+                        cheapests.append(response.json()[0])
+        sortedFLights = sorted(cheapests, key=lambda k: k['price'])
+        return sortedFLights[0]
+
 
 ##
 ## Actually setup the Api resource routing here
@@ -74,4 +86,4 @@ api.add_resource(TestAction, '/test')
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True, threaded=True)
