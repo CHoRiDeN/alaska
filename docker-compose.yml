@@ -1,0 +1,8 @@
+alaska:
+  container_name: alaska-test
+
+  volumes:
+    - "./source:/deploy/source"
+  build: .
+  ports:
+   - "5000:5000"
