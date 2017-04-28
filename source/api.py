@@ -1,6 +1,4 @@
 from flask import Flask
-import requests
-import json
 from domain.cheapestRouteUseCase import getCheapestRoute
 from flask_restful import reqparse, abort, Api, Resource
 
@@ -57,12 +55,10 @@ class TodoList(Resource):
         TODOS[todo_id] = {'task': args['task']}
         return TODOS[todo_id], 201
 
+
 class TestAction(Resource):
-
     def get(self):
-
-        cheapests = []
-        availDest = ['AMS','BER','MIL','PAR','MUC','OSL']
+        availDest = ['AMS','BER','MIL']
         cheapestRoute = getCheapestRoute(availDest,'BCN')
         return cheapestRoute
 
@@ -70,9 +66,7 @@ class TestAction(Resource):
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(TodoList, '/todos')
-api.add_resource(Todo, '/todos/<todo_id>')
-api.add_resource(TestAction, '/test')
+api.add_resource(TestAction, '/route')
 
 
 if __name__ == "__main__":
