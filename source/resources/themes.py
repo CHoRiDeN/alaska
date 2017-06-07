@@ -17,6 +17,3 @@ themes = [
         'destinations': ['BCN','MAD']
     },
 ]
-class Themes(Resource):
-    def get(self):
-        return themes
