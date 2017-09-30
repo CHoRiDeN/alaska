@@ -1,6 +1,16 @@
 from flask_restful import Resource
+from flask import jsonify
 from resources.themes import themes
 from domain.cheapestRouteUseCase import getCheapestRoute
+from pymongo import MongoClient
+from bson.json_util import dumps
+from bson import json_util, ObjectId
+import json
+
+client = MongoClient(
+    'alaska-database',
+    27017)
+db = client.tripsdb
 
 class ThemesAction(Resource):
     def get(self):
@@ -8,6 +18,23 @@ class ThemesAction(Resource):
 
 class RouteAction(Resource):
     def get(self):
-        availDest = ['AMS','BER','MIL']
-        cheapestRoute = getCheapestRoute(availDest,'BCN')
-        return cheapestRoute
+        pipeline = [
+            {
+                "$project": {
+                    "month": {"$month": "$dateFrom"},
+                    "dateFrom": 1,
+                    'dateTo': 1,
+                    'price': 1,
+                    'departure': 1,
+                    'destination1': 1,
+                    'destination2': 1,
+                    'arrival': 1,
+                }
+            },
+            {"$match": {"month": 11}}
+        ]
+        cursor = db.tripsdb.aggregate(pipeline)
+
+        result = list(cursor)
+
+        return json.loads(json_util.dumps(result))

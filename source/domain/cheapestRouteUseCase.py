@@ -8,5 +8,5 @@ def getCheapestRoute(availDest, origin):
                 response = flightMultiCall(dest1,dest2)
                 if len(response.json()) > 0:
                     cheapests.append(response.json()[0])
-    sortedFLights = sorted(cheapests, key=lambda k: k['price'])
-    return sortedFLights[0]
+    #sortedFLights = sorted(cheapests, key=lambda k: k['price'])
+    return cheapests[0]

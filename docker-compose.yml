@@ -6,3 +6,10 @@ alaska:
   build: .
   ports:
    - "5000:5000"
+  links:
+    - alaska-database
+
+alaska-database:
+  image: mongo:3.0.2
+  ports:
+    - "27017:27017"
