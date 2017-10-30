@@ -1,15 +1,18 @@
-alaska:
-  container_name: alaska-test
+version: "3"
+services:
+  alaska:
+    container_name: alaska-test
+    volumes:
+      - "./source:/deploy/source"
+    image: alaska-back
+    ports:
+     - "5000:5000"
+    links:
+      - alaska-database
 
-  volumes:
-    - "./source:/deploy/source"
-  build: .
-  ports:
-   - "5000:5000"
-  links:
-    - alaska-database
-
-alaska-database:
-  image: mongo:3.0.2
-  ports:
-    - "27017:27017"
+  alaska-database:
+    image: mongo:3.0.2
+    ports:
+      - "27017:27017"
+    volumes:
+      - "/mongo/db/data:/data/db"

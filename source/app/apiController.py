@@ -14,7 +14,7 @@ db = client.tripsdb
 
 class ThemesAction(Resource):
     def get(self):
-        return themes
+        return 'test'
 
 class RouteAction(Resource):
     def get(self):
@@ -22,6 +22,7 @@ class RouteAction(Resource):
             {
                 "$project": {
                     "month": {"$month": "$dateFrom"},
+                    "year": {"$year": "$dateFrom"},
                     "dateFrom": 1,
                     'dateTo': 1,
                     'price': 1,
@@ -31,7 +32,8 @@ class RouteAction(Resource):
                     'arrival': 1,
                 }
             },
-            {"$match": {"month": 11}}
+            {"$match": {"month": 12, "year": 2017}}
+
         ]
         cursor = db.tripsdb.aggregate(pipeline)
 

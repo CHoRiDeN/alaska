@@ -17,9 +17,14 @@ def getCheapestRoute(availDest, origin,startDateFrom):
     for dest1 in availDest:
         for dest2 in availDest:
             if dest1 is not dest2:
-                response = flightMultiCall(dest1,dest2,origin,startDateFrom)
-                if len(response.json()) > 0:
-                    cheapests.append(response.json()[0])
+                response = flightMultiCall(dest1, dest2, origin, startDateFrom)
+                try:
+                    if len(response.json()) > 0:
+                        cheapests.append(response.json()[0])
+                except:
+                    print('Error for '+origin+'->'+dest1+'->'+dest2+'->'+origin)
+                    print(response)
+
     sortedFLights = sorted(cheapests, key=lambda k: k['price'])
     for route in sortedFLights:
         if route['price'] < 100:
@@ -37,6 +42,7 @@ def getCheapestRoute(availDest, origin,startDateFrom):
                 'destination1': route['route'][0]['route'][0]['cityTo'],
                 'destination2': route['route'][1]['route'][0]['cityTo'],
                 'arrival': route['route'][2]['route'][0]['cityTo'],
+                'foundAt': datetime.datetime.now(),
                 'raw': route
             }
             print('saving route found')
