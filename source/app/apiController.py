@@ -30,6 +30,8 @@ class RouteAction(Resource):
                     'destination1': 1,
                     'destination2': 1,
                     'arrival': 1,
+                    'jumps': 1,
+                    'foundAt': 1
                 }
             },
             {"$match": {"month": int(month), "year": int(year)}}
