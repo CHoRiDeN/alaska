@@ -14,6 +14,7 @@ db = client.tripsdb
 
 def getCheapestRoute(availDest, origin,startDateFrom):
     cheapests = []
+    maxRoutesPerDay = 5
     for dest1 in availDest:
         for dest2 in availDest:
             if dest1 is not dest2:
@@ -26,8 +27,9 @@ def getCheapestRoute(availDest, origin,startDateFrom):
                     print(response)
 
     sortedFLights = sorted(cheapests, key=lambda k: k['price'])
+    countRoutes = 0
     for route in sortedFLights:
-        if route['price'] < 100:
+        if route['price'] < 100 and countRoutes < maxRoutesPerDay:
             departureDateEpoch = route['route'][0]['dTimeUTC']
             departureDateTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(departureDateEpoch))
             departureDateTime = datetime.datetime.strptime(departureDateTime, '%Y-%m-%d %H:%M:%S')
@@ -68,6 +70,7 @@ def getCheapestRoute(availDest, origin,startDateFrom):
                 'raw': route
             }
             print('saving route found')
+            countRoutes = countRoutes+1
             inserted = db.tripsdb.insert_one(item_doc)
     return sortedFLights[0]
 
@@ -90,10 +93,12 @@ departure = 'BCN'
 startDateFrom = datetime.datetime.now()
 startDateFrom = startDateFrom + datetime.timedelta(days=45)
 
+start = time.time()
 for i in range(100):
-    start = time.time()
     startDateFrom = startDateFrom + datetime.timedelta(days=1)
-    best = getCheapestRoute(destinations,departure,startDateFrom)
-    print('saving route found')
-    end = time.time()
+    getCheapestRoute(destinations,departure,startDateFrom)
+
+end = time.time()
+print('done')
+print(end-start)
 
