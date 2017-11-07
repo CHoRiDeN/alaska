@@ -14,7 +14,7 @@ db = client.tripsdb
 
 def getCheapestRoute(availDest, origin,startDateFrom):
     cheapests = []
-    maxRoutesPerDay = 5
+    maxRoutesPerDay = 3
     for dest1 in availDest:
         for dest2 in availDest:
             if dest1 is not dest2:
@@ -88,7 +88,7 @@ def flightMultiCall(dest1,dest2,departure,dateFrom):
     response = requests.post('https://api.skypicker.com/flights_multi?partner=picky&locale=es&curr=EUR', data = json.dumps(r), headers = {'Content-Type':'application/json'} )
     return response
 
-destinations = ['MIL','AMS','BER','LON','ROM','DBV','BUD']
+destinations = ['MIL','AMS','BER','LON','ROM','CPH','BUD','PAR']
 departure = 'BCN'
 startDateFrom = datetime.datetime.now()
 startDateFrom = startDateFrom + datetime.timedelta(days=45)
