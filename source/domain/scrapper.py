@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 import time
 
 client = MongoClient(
-    'alaska-database',
+    'database',
     27017)
 db = client.tripsdb
 
@@ -29,7 +29,7 @@ def getCheapestRoute(availDest, origin,startDateFrom):
     sortedFLights = sorted(cheapests, key=lambda k: k['price'])
     countRoutes = 0
     for route in sortedFLights:
-        if route['price'] < 100 and countRoutes < maxRoutesPerDay:
+        if route['price'] < 100:
             departureDateEpoch = route['route'][0]['dTimeUTC']
             departureDateTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(departureDateEpoch))
             departureDateTime = datetime.datetime.strptime(departureDateTime, '%Y-%m-%d %H:%M:%S')
@@ -88,13 +88,13 @@ def flightMultiCall(dest1,dest2,departure,dateFrom):
     response = requests.post('https://api.skypicker.com/flights_multi?partner=picky&locale=es&curr=EUR', data = json.dumps(r), headers = {'Content-Type':'application/json'} )
     return response
 
-destinations = ['MIL','AMS','BER','LON','ROM','CPH','BUD','PAR']
+destinations = ['PRG','AMS','BER','LON','MIL','ROM','CPH','stockholm','PAR', 'OPO', 'MUC', 'RTM','BRU','DUB','WAW']
 departure = 'BCN'
 startDateFrom = datetime.datetime.now()
-startDateFrom = startDateFrom + datetime.timedelta(days=45)
+startDateFrom = startDateFrom + datetime.timedelta(days=35)
 
 start = time.time()
-for i in range(100):
+for i in range(95):
     startDateFrom = startDateFrom + datetime.timedelta(days=1)
     getCheapestRoute(destinations,departure,startDateFrom)
 

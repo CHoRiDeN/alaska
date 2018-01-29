@@ -8,7 +8,7 @@ from bson import json_util, ObjectId
 import json
 
 client = MongoClient(
-    'alaska-database',
+    'database',
     27017)
 db = client.tripsdb
 
@@ -16,7 +16,7 @@ class ThemesAction(Resource):
     def get(self):
         return 'test'
 
-class RouteAction(Resource):
+class RoutesAction(Resource):
     def get(self, month, year):
         pipeline = [
             {

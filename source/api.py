@@ -11,7 +11,7 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('task')
 
-api.add_resource(RouteAction, '/route/<month>/<year>')
+api.add_resource(RoutesAction, '/routes/<month>/<year>')
 api.add_resource(ThemesAction, '/themes')
 
 

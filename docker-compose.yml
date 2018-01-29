@@ -1,6 +1,6 @@
 version: "3"
 services:
-  alaska:
+  api:
     container_name: alaska-test
     volumes:
       - "./source:/deploy/source"
@@ -10,9 +10,9 @@ services:
     links:
       - alaska-database
 
-  alaska-database:
+  database:
     image: mongo:3.0.2
     ports:
-      - "27017:27017"
+      - "27088:27017"
     volumes:
       - "/mongo/db/data:/data/db"
