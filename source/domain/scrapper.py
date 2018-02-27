@@ -1,9 +1,7 @@
 import requests
-import requests
 import datetime
 import json
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 import time
 
 client = MongoClient(
@@ -72,7 +70,7 @@ def getCheapestRoute(availDest, origin,startDateFrom):
             print('saving route found')
             countRoutes = countRoutes+1
             inserted = db.tripsdb.insert_one(item_doc)
-    return sortedFLights[0]
+    return true
 
 def flightMultiCall(dest1,dest2,departure,dateFrom):
     date2 = dateFrom + datetime.timedelta(days=1)
