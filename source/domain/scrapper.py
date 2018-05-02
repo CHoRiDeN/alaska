@@ -70,7 +70,7 @@ def getCheapestRoute(availDest, origin,startDateFrom):
             print('saving route found')
             countRoutes = countRoutes+1
             inserted = db.tripsdb.insert_one(item_doc)
-    return true
+    return
 
 def flightMultiCall(dest1,dest2,departure,dateFrom):
     date2 = dateFrom + datetime.timedelta(days=1)
