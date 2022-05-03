@@ -17,55 +17,50 @@ def getCheapestRoute(availDest, origin,startDateFrom):
         for dest2 in availDest:
             if dest1 is not dest2:
                 response = flightMultiCall(dest1, dest2, origin, startDateFrom)
+
                 try:
-                    if len(response.json()) > 0:
-                        cheapests.append(response.json()[0])
+                    if len(response.json()['data']) > 0:
+                        print('adding route')
+                        cheapests.append(response.json()['data'][0])
                 except:
                     print('Error for '+origin+'->'+dest1+'->'+dest2+'->'+origin)
                     print(response)
+                    print(response.json())
 
+    print('sorting')
     sortedFLights = sorted(cheapests, key=lambda k: k['price'])
     countRoutes = 0
-    for route in sortedFLights:
-        if route['price'] < 100:
-            departureDateEpoch = route['route'][0]['dTimeUTC']
-            departureDateTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(departureDateEpoch))
-            departureDateTime = datetime.datetime.strptime(departureDateTime, '%Y-%m-%d %H:%M:%S')
-            arrivalDateEpoch = route['route'][2]['aTimeUTC']
-            arrivalDateTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(arrivalDateEpoch))
-            arrivalDateTime = datetime.datetime.strptime(arrivalDateTime, '%Y-%m-%d %H:%M:%S')
+    print(len(sortedFLights))
+    print('Filtering...')
+    for result in sortedFLights:
+        print(result)
+        if result['price'] < 100:
+            print('found less than 100€')
             jumps = []
-            for jump in route['route']:
+            for jump in result['route']:
                 jumpInfo = {
                     'cityFrom': jump['route'][0]['cityFrom'],
                     'codeFrom': jump['route'][0]['flyFrom'],
                     'cityTo': jump['route'][0]['cityTo'],
                     'codeTo': jump['route'][0]['flyTo'],
-                    'departureDatetime': jump['route'][0]['dTime'],
-                    'arrivalDatetime': jump['route'][0]['aTime'],
-                    'departureLocation': {
-                        'lng': jump['route'][0]['lngFrom'],
-                        'lat': jump['route'][0]['latFrom'],
-                    },
-                    'arrivalLocation': {
-                        'lng': jump['route'][0]['lngTo'],
-                        'lat': jump['route'][0]['latTo'],
-                    },
+                    'departureDatetime': jump['route'][0]['utc_departure'],
+                    'arrivalDatetime': jump['route'][0]['utc_arrival'],
                     'flightNum': jump['route'][0]['flight_no'],
                     'airlineCode': jump['route'][0]['airline']
                 }
                 jumps.append(jumpInfo)
             item_doc = {
-                'dateFrom': departureDateTime,
-                'dateTo': arrivalDateTime,
-                'price': route['price'],
-                'departure': route['route'][0]['route'][0]['cityFrom'],
-                'destination1': route['route'][0]['route'][0]['cityTo'],
-                'destination2': route['route'][1]['route'][0]['cityTo'],
-                'arrival': route['route'][2]['route'][0]['cityTo'],
+                'dateFrom': result['route'][0]['utc_departure'],
+                'dateTo': result['route'][0]['utc_arrival'],
+                'price': result['price'],
+                'departure': result['route'][0]['route'][0]['cityFrom'],
+                'destination1': result['route'][0]['route'][0]['cityTo'],
+                'destination2': result['route'][1]['route'][0]['cityTo'],
+                'arrival': result['route'][2]['route'][0]['cityTo'],
                 'foundAt': datetime.datetime.now(),
                 'jumps': jumps,
-                'raw': route
+                'link': 'https://www.kiwi.com/en/booking?lang=en&currency=eur&booking_token=',
+                'raw': result
             }
             print('saving route found')
             countRoutes = countRoutes+1
@@ -73,23 +68,46 @@ def getCheapestRoute(availDest, origin,startDateFrom):
     return
 
 def flightMultiCall(dest1,dest2,departure,dateFrom):
-    date2 = dateFrom + datetime.timedelta(days=1)
-    date3 = date2 + datetime.timedelta(days=1)
-    date4 = date3 + datetime.timedelta(days=1)
-    date5 = date4 + datetime.timedelta(days=1)
-    date6 = date5 + datetime.timedelta(days=1)
-    r = {"requests": [
-        {"to": dest1, "flyFrom": departure, "directFlights": 1, "dateFrom": dateFrom.strftime("%d/%m/%Y"), "dateTo": date2.strftime("%d/%m/%Y")},
-        {"to": dest2, "flyFrom": dest1, "directFlights": 1, "dateFrom": date3.strftime("%d/%m/%Y"), "dateTo": date4.strftime("%d/%m/%Y")},
-        {"to": departure, "flyFrom": dest2, "directFlights": 1, "dateFrom": date5.strftime("%d/%m/%Y"), "dateTo": date6.strftime("%d/%m/%Y")}
-    ]}
-    response = requests.post('https://api.skypicker.com/flights_multi?partner=picky&locale=es&curr=EUR', data = json.dumps(r), headers = {'Content-Type':'application/json'} )
+    print('checkin '+departure+' - '+dest1+' - '+dest2+' - '+departure+' on '+dateFrom.strftime("%d/%m/%Y"))
+    url = "https://tequila-api.kiwi.com/v2/nomad?adults=1&sort=price&limit=10&date_from="+dateFrom.strftime("%d/%m/%Y")+"&date_to="+dateFrom.strftime("%d/%m/%Y")+"&fly_from="+departure+"&fly_to="+departure
+    r = {
+      "via": [
+        {
+          "locations": [
+            dest1
+          ],
+          "nights_range": [
+            1,
+            2
+          ]
+        },
+        {
+          "locations": [
+            dest2
+          ],
+          "nights_range": [
+            1,
+            2
+          ]
+        }
+      ]
+    }
+
+    headers = {
+      'accept': 'application/json',
+      'apikey': 'OWV4CI2G2vXy3KyqVRxcFrmxqT_V0g9h',
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=json.dumps(r))
     return response
 
-destinations = ['PRG','AMS','BER','LON','MIL','ROM','CPH','stockholm','PAR', 'OPO', 'MUC', 'RTM','BRU','DUB','WAW']
+
+#destinations = ['PRG','AMS','BER','LON','MIL','ROM','CPH','stockholm','PAR', 'OPO', 'MUC', 'RTM','BRU','DUB','WAW']
+destinations = ['PRG','AMS','BER','LON','stockholm','PAR', 'OPO', 'MUC', 'RTM','BRU']
 departure = 'BCN'
 startDateFrom = datetime.datetime.now()
-startDateFrom = startDateFrom + datetime.timedelta(days=35)
+startDateFrom = startDateFrom + datetime.timedelta(days=65)
 
 start = time.time()
 for i in range(95):
